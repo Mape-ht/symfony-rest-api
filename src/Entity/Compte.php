@@ -4,11 +4,16 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CompteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=CompteRepository::class)
+ * 
  */
 class Compte
 {
@@ -21,6 +26,7 @@ class Compte
 
     /**
      * @ORM\Column(type="string", length=55)
+     * @Groups({"read:operation"})
      */
     private $numero;
 
@@ -38,6 +44,17 @@ class Compte
      * @ORM\Column(type="string", length=55)
      */
     private $typecompte;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Operation::class, mappedBy="compte", orphanRemoval=true)
+     * @Groups({"read:operation"})
+     */
+    private $operations;
+
+    public function __construct()
+    {
+        $this->operations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -88,6 +105,37 @@ class Compte
     public function setTypecompte(string $typecompte): self
     {
         $this->typecompte = $typecompte;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Operation[]
+     */
+    public function getOperations(): Collection
+    {
+        return $this->operations;
+    }
+
+    public function addOperation(Operation $operation): self
+    {
+        if (!$this->operations->contains($operation)) {
+            $this->operations[] = $operation;
+            $operation->setCompte($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOperation(Operation $operation): self
+    {
+        if ($this->operations->contains($operation)) {
+            $this->operations->removeElement($operation);
+            // set the owning side to null (unless already changed)
+            if ($operation->getCompte() === $this) {
+                $operation->setCompte(null);
+            }
+        }
 
         return $this;
     }
