@@ -5,13 +5,16 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\OperationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
+ *      normalizationContext={"groups"={"read:operation"}},
  *      collectionOperations={"get"},
  *      itemOperations={"get"}
  * )
  * @ORM\Entity(repositoryClass=OperationRepository::class)
+ *
  */
 class Operation
 {
@@ -19,33 +22,45 @@ class Operation
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read:operation"})
      */
     private $id;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="string")
+     * @Groups({"read:operation"})
      */
     private $typeoperation;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:operation"})
      */
     private $montant;
 
     /**
      * @ORM\Column(type="string", length=55)
+     * @Groups({"read:operation"})
      */
     private $typefrais;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:operation"})
      */
     private $montantfrais;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:operation"})
      */
     private $solde;
+
+    /**
+     * @ORM\Column(type="date")
+     * @Groups({"read:operation"})
+     */
+    private $dateoperation;
 
     public function getId(): ?int
     {
@@ -108,6 +123,18 @@ class Operation
     public function setSolde(int $solde): self
     {
         $this->solde = $solde;
+
+        return $this;
+    }
+
+    public function getDateoperation(): ?\DateTimeInterface
+    {
+        return $this->dateoperation;
+    }
+
+    public function setDateoperation(\DateTimeInterface $dateoperation): self
+    {
+        $this->dateoperation = $dateoperation;
 
         return $this;
     }
